@@ -39,23 +39,34 @@ window.onload = function() {
 		
 		preload: function()
 		{
-			this.load.image('worldBack','assets/metal.png')
+			this.load.image('traffic','assets/traffic.png')
+			this.load.bitmapFont('carrier_font', 'assets/carrier_command.png', 'assets/carrier_command.xml');
+			this.load.image('road','assets/road.png')
 			
 		},
 		
 		update: function()
 		{
-			this.background=this.game.add.tileSprite(0, 0,800,600, 'worldBack');
+			this.background=this.game.add.tileSprite(0, 0,1024,600, 'traffic');
+			this.game.add.image(150,1,'road');
 			
-			this.style = {font: "25px Arial", fill: "#00FF0A", align: "center" };
-			this.text = this.add.text( this.world.centerX, 150, "Once upon a time phaser-dude bob " +
-				"lost his dog.\n He searched and he searched but to no avail.\n Until one day, a message showed up at his house\n" +
-				" if you want you dog back, go to the Lair of the Monsters,\n find the 3 hidden keys and only then will you get" + 
-				"back you dog!\n So Bob went....... \n\n(Press the Left Arrow, <- , to begin)", this.style );
-			this.text.anchor.setTo( 0.5, 0.0 );
+			this.logo=this.game.add.bitmapText(230, 450, 'carrier_font','Traffic',52);
+			this.logo.tint=0xFFFF00;
 			
 			
+			//story lines
+			this.game.add.bitmapText(400,150,'carrier_font','You are',14);
+			this.game.add.bitmapText(350,190,'carrier_font','running late',14);
+			this.game.add.bitmapText(320,230,'carrier_font','for an interview',14);
+			this.game.add.bitmapText(289,270,'carrier_font','As you get on Rt. 7',14)
+			this.game.add.bitmapText(300,310,'carrier_font','You have one goal:',14)
+			this.game.add.bitmapText(400,395,'carrier_font','Avoid',18)
+			
+			
+			//instructions to start
+			this.game.add.bitmapText(250,550,'carrier_font','Left Arrow key to start',14)
 			this.cursors = this.input.keyboard.createCursorKeys();
+			
 			if (this.cursors.left.isDown)
 			{
 				this.gotoStateB();
@@ -107,6 +118,7 @@ window.onload = function() {
 		this.text;
 		this.style;
 		
+		
 	};
 	
 	P2Game.StateC.prototype = 
@@ -144,23 +156,24 @@ window.onload = function() {
 	
 	P2Game.StateB = function(game)
 		{
-			this.mummies;
-			this.bob;
+			this.mainCar;
+			this.traffic;
+			this.road;
 			this.keys;
-			this.text;
-			this.style;
-			this.key;
+			this.potHoles;
+			this.time=100;
 		}
+		
 	
 	P2Game.StateB.prototype=
 	{
 		preload: function() 
 		{
         //pre-loading the zombies
-			this.load.spritesheet('bob', 'assets/phaser-dude.png');
-			this.load.spritesheet('mummy', 'assets/metalslug_monster39x40.png',39,40,16);
-			this.load.spritesheet('key','assets/key.png',32,24);
-			this.game.stage.backgroundColor = '#000000';
+			this.load.image('mainRoad', 'assets/mainRoad.png');
+			this.load.image('mainCar', 'assets/mainCar.png');
+			this.load.image('car','assets/car.png')
+			this.load.bitmapFont('carrier_font', 'assets/carrier_command.png', 'assets/carrier_command.xml');
 		},
     
 
@@ -170,93 +183,74 @@ window.onload = function() {
 			
 		//world boundary
 			this.world.setBounds(0,0,800,600);
+			this.game.add.image(0,0,'mainRoad');
 			
-		//starting physics:
+			// starting physics:
 			this.game.physics.startSystem(Phaser.Physics.ARCADE);
-		
-		//creating mummies
-			this.mummies = this.add.group();
-		//and bob
-			this.bob = this.add.sprite(300,100,'bob');
-		//adding the key
-			this.key=this.add.sprite(600,200,'key');
-			this.key.exists=false;
+			this.game.add.bitmapText(300, 50, 'carrier_font','Time Left to Interview:',15);
+			this.game.add.bitmapText(350, 150, 'carrier_font',this.time,30);
+			// creating potholes
+			//this.potHoles = this.add.group();
 			
-		
-		//Creating 10 mummies, each initially dead
-			this.mummies.createMultiple(50,"mummy",0,false);
-		
-			this.game.physics.enable(this.key,Phaser.Physics.ARCADE);
-			this.game.physics.enable(this.mummies,Phaser.Physics.ARCADE);
-			this.game.physics.enable(this.bob,Phaser.Physics.ARCADE);
-		
-		//bringing mummies to life!
+			//main character car
+			this.mainCar = this.add.sprite(300,350,'mainCar');
+			this.traffic=this.add.group();
+			// adding the key
+				// // this.key=this.add.sprite(600,200,'key');
+				// // this.key.exists=false;
+				
 			
-			this.game.time.events.repeat(Phaser.Timer.SECOND/2, 100, this.resurrect,this );
+			// Creating 10 mummies, each initially dead
+			this.traffic.createMultiple(50,"car",0,false);
+			
+			
+			
+			this.game.physics.enable(this.mainCar,Phaser.Physics.ARCADE);
+			
+				
+			
+			// bringing mummies to life!
+				
+			this.game.time.events.repeat(Phaser.Timer.SECOND*3, 100, this.resurrect,this );
 			this.game.time.events.repeat(Phaser.Timer.SECOND,100,this.randKey,this)
- 
-        //getting the key to move around and bounce
-			this.key.body.collideWorldBounds=true;
-			this.key.body.velocity.setTo(200,200);
+	 
+			// getting the key to move around and bounce
+				// // this.key.body.collideWorldBounds=true;
+				// // this.key.body.velocity.setTo(200,200);
+				
+				// // this.physics.arcade.collide(this.mummies,this.key);
+				// // this.key.body.bounce.set(1);
+		
+		
+				// Add some text using a CSS style.
+			// Center it in X, and position its top 15 pixels from the top of the world.
+				// // this.style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
+				// // this.text = this.add.text( this.world.centerX, 15, "Don't Let the Monsters Get You!.", this.style );
+				// // this.text.anchor.setTo( 0.5, 0.0 );
 			
-			this.physics.arcade.collide(this.mummies,this.key);
-			this.key.body.bounce.set(1);
-	
-	
-			// Add some text using a CSS style.
-        // Center it in X, and position its top 15 pixels from the top of the world.
-			this.style = { font: "25px Verdana", fill: "#9999ff", align: "center" };
-			this.text = this.add.text( this.world.centerX, 15, "Don't Let the Monsters Get You!.", this.style );
-			this.text.anchor.setTo( 0.5, 0.0 );
-		
-		
+			
 			this.keys = this.input.keyboard.createCursorKeys();
+			
+				
+			
+		
+			
+		
 		
 			
 		},
-	
-		randKey: function(){
-			
-			if(!this.key.exists)
-			{
-				this.key.exists=true;
-			}
-			
-			this.key.x=this.rnd.integerInRange(0,800);
-			this.key.y=this.rnd.integerInRange(0,600);
-			
-		},
-	
-	
+		
 		resurrect: function()
 		{
-			
-		
-			
-		 //Get a dead item
-			var item = this.mummies.getFirstDead();
-			
-			if (item)
-			{
-			 //And bring it back to life
-				item.reset((this.world.randomX + (this.key.x)), (this.world.randomY+(this.key.y)));
-
-			 //This just changes its frame
-				item.frame = this.rnd.integerInRange(0, 36);
-			
-			//getting the mummies to run
-				item.animations.add('walk');
-
-				item.animations.play('walk', 30, true);
-			
-			//and move towards cursor
-				item.rotation = this.physics.arcade.moveToObject( item,this.bob, 200+this.rnd.integerInRange(10,200) );
-				item.checkWorldBounds=true;
-			}
-
-			
+			this.traffic.create(game.rnd.integerInRange(90,700), 50, 'car', null)
+			this.traffic.y+=50;
 		},
-	
+		
+		randKey: function(){
+				
+				this.time-=1;
+			},
+		
 		update: function()
 		{
 			//window.alert("here?");
@@ -266,40 +260,26 @@ window.onload = function() {
 			
 				
 			//inital bob speed
-			this.bob.body.velocity.x=0;
-			this.bob.body.velocity.y=0;
+			// this.bob.body.velocity.x=0;
+			// this.bob.body.velocity.y=0;
 			
 			if (this.keys.left.isDown)
 			{
-				this.bob.body.velocity.x=-200;	
+				this.mainCar.x-=50;	
 			}
 		
 			if (this.keys.right.isDown)
 			{
-				this.bob.body.velocity.x=200;	
+				this.mainCar.x+=50;	
 			}
 		
-			if (this.keys.up.isDown)
-			{	
-				this.bob.body.velocity.y=-200;	
-			}
 		
-			if (this.keys.down.isDown)
-			{	
-				this.bob.body.velocity.y=200;
-			}
-	
-			if(this.physics.arcade.overlap(this.bob,this.mummies,null,null,this))
+			
+			if(this.physics.arcade.overlap(this.mainCar,this.traffic,null,null,this))
 			{
-				this.bob.kill();
-				this.bob.exists=false;	
-				this.goToStateC();
+				this.time-=10;
 			}
 			
-			if(this.physics.arcade.overlap(this.bob,this.key,null,null,this))
-			{
-				this.goToStateD();
-			}
 			
 			
 				
